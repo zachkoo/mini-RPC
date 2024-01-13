@@ -7,6 +7,7 @@ import org.apache.zookeeper.CreateMode;
 
 import constant.Constants;
 import factory.ZooKeeperFactory;
+import handler.SimpleServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -41,7 +42,7 @@ public class NettyServer {
 			             }
 			         });
 			
-            ChannelFuture f = bootstrap.bind(8081).sync();
+            ChannelFuture f = bootstrap.bind(8082).sync();
     		CuratorFramework client = ZooKeeperFactory.create();
     		InetAddress netAddress = InetAddress.getLocalHost();
     		
