@@ -21,8 +21,8 @@ public class ZooKeeperFactory {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		CuratorFramework clientCuratorFramework = create();
-		client.create().forPath("/netty");
+//		CuratorFramework client = create();
+//		client.create().forPath("/netty");
 		
 	}
 }

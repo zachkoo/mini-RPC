@@ -1,5 +1,12 @@
 package server;
 
+import java.net.InetAddress;
+
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.zookeeper.CreateMode;
+
+import constant.Constants;
+import factory.ZooKeeperFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -34,7 +41,12 @@ public class NettyServer {
 			             }
 			         });
 			
-            ChannelFuture f = bootstrap.bind(8080).sync();
+            ChannelFuture f = bootstrap.bind(8081).sync();
+    		CuratorFramework client = ZooKeeperFactory.create();
+    		InetAddress netAddress = InetAddress.getLocalHost();
+    		
+    		client.create().withMode(CreateMode.EPHEMERAL).forPath(Constants.SERVER_PATH + netAddress.getHostAddress());
+    		
             f.channel().closeFuture().sync();
             
 		} catch (Exception e) {
