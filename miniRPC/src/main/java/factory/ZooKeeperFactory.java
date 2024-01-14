@@ -9,7 +9,7 @@ public class ZooKeeperFactory {
 	
 	public static CuratorFramework client;
 	
-	public static CuratorFramework create() {
+	public static CuratorFramework getClient() {
 		if(client == null) {
 			RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
 			client = CuratorFrameworkFactory.newClient("localhost:2181", retryPolicy);
@@ -18,9 +18,4 @@ public class ZooKeeperFactory {
 		return client;
 	}
 	
-	public static void main(String[] args) throws Exception {
-//		CuratorFramework client = create();
-//		client.create().forPath("/netty");
-		
-	}
 }
