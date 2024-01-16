@@ -18,13 +18,13 @@ public class TestTcp {
 		List<User> users = new ArrayList<User>();
 		User u1 = new User();
 		u1.setId(1);
-		u1.setName("AA");
+		u1.setName("AAA");
 		User u2 = new User();
 		u2.setId(2);
-		u2.setName("BB");
+		u2.setName("BBB");
 		User u3 = new User();
 		u3.setId(3);
-		u3.setName("CC");
+		u3.setName("CCC");
 		users.add(u1);
 		users.add(u2);
 		users.add(u3);
