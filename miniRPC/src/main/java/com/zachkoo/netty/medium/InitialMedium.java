@@ -6,7 +6,9 @@ import java.util.Map;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
+
+import com.zachkoo.netty.annotation.Remote;
+
 
 @Component
 public class InitialMedium implements BeanPostProcessor{
@@ -19,10 +21,10 @@ public class InitialMedium implements BeanPostProcessor{
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		
-		if(bean.getClass().isAnnotationPresent(Controller.class)) {
+		if(bean.getClass().isAnnotationPresent(Remote.class)) {
 			Method[] methods = bean.getClass().getDeclaredMethods();
 			for(Method m: methods) {
-				String key = bean.getClass().getName()+"."+m.getName();
+				String key = bean.getClass().getInterfaces()[0].getName()+"."+m.getName();
 				Map<String, BeanMethod> beanMap = Medium.beanMap;
 				BeanMethod beanMethod = new BeanMethod();
 				beanMethod.setBean(bean);

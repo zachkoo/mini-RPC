@@ -1,18 +1,17 @@
-package com.zachkoo.user.controller;
+package com.zachkoo.user.remote;
 
 import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.springframework.stereotype.Controller;
-
+import com.zachkoo.netty.annotation.Remote;
 import com.zachkoo.netty.param.Response;
 import com.zachkoo.netty.util.ResponseUtil;
 import com.zachkoo.user.bean.User;
 import com.zachkoo.user.service.UserService;
 
-@Controller
-public class UserController {
+@Remote
+public class UserRemoteImpl implements UserRemote {
 	
 	@Resource
 	private UserService userService;
