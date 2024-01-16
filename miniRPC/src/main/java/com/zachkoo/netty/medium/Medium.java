@@ -29,9 +29,9 @@ public class Medium {
 	}
 	
 	// 反射处理业务代码
-	public Object process(ServerRequest request) {
+	public Response process(ServerRequest request) {
+		Response result = null;
 		try {
-			Response result = null;
 			String command = request.getCommand();
 			BeanMethod beanMethod = beanMap.get(command);
 			if(beanMethod == null) {
@@ -43,11 +43,12 @@ public class Medium {
 			Object content = request.getContent();
 			Object args = JSONObject.parseObject(JSONObject.toJSONString(content), paramType);
 			result = (Response) method.invoke(bean, args);
+			result.setId(request.getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return result;
 	}
 
 }
