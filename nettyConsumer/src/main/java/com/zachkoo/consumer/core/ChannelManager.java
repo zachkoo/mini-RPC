@@ -34,6 +34,11 @@ public class ChannelManager {
 		}else{
 			channelFuture = channelFutures.get(i.getAndIncrement());
 		}
+		
+		if(!channelFuture.channel().isActive()) {
+			channelFutures.remove(channelFuture);
+			return get(position);
+		}
 		return channelFuture;
 	}
 	
