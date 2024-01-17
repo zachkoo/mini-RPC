@@ -1,10 +1,18 @@
 package com.zachkoo.consumer.core;
 
 
+import java.util.List;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.api.CuratorWatcher;
+
 import com.alibaba.fastjson.JSONObject;
+import com.zachkoo.consumer.constant.Constants;
 import com.zachkoo.consumer.handler.SimpleClientHandler;
 import com.zachkoo.consumer.param.ClientRequest;
 import com.zachkoo.consumer.param.Response;
+import com.zachkoo.consumer.zookeeper.ServerWatcher;
+import com.zachkoo.consumer.zookeeper.ZooKeeperFactory;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -18,18 +26,17 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 public class NettyClient {
 	
+	 public static final Bootstrap bootstrap = new Bootstrap();
 	 static ChannelFuture f = null;
-	 
 	 static {
 		 String host = "localhost";
-		 int port = 8081;
+		 int port = 8090;
+		 EventLoopGroup workerGroup = new NioEventLoopGroup(); 
 		 
-		 EventLoopGroup workerGroup = new NioEventLoopGroup();
          try {
-        	Bootstrap b = new Bootstrap();
-            b.group(workerGroup);
-            b.channel(NioSocketChannel.class);
-            b.handler(new ChannelInitializer<SocketChannel>() {
+            bootstrap.group(workerGroup)
+             .channel(NioSocketChannel.class)
+             .handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                 	//入站处理器（InboundHandler）
@@ -41,20 +48,49 @@ public class NettyClient {
                 }
             });
             
-			f = b.connect(host, port).sync();
+			CuratorFramework client = ZooKeeperFactory.getClient();
+			List<String> serverPaths = client.getChildren().forPath(Constants.SERVER_PATH);
+			System.out.println("serverPaths: " + serverPaths);
+			//客户端加上zookeeper监听服务器的变化
+			CuratorWatcher watcher = new ServerWatcher();
+			client.getChildren().usingWatcher(watcher).forPath(Constants.SERVER_PATH);
 			
-		 } catch (InterruptedException e) {
+			for(String path :serverPaths){
+				String[] str = path.split("#");
+				int weight = Integer.valueOf(str[2]);
+				if(weight > 0) {
+					for (int w = 0; w <= weight; w++) {
+						ChannelManager.realServerPaths.add(str[0]+"#"+str[1]);
+						ChannelFuture channnelFuture = bootstrap.connect(str[0], Integer.valueOf(str[1]));
+						ChannelManager.addChannel(channnelFuture);
+					}
+				}else {
+					ChannelManager.realServerPaths.add(str[0]+"#"+str[1]);
+					ChannelFuture channnelFuture = bootstrap.connect(str[0], Integer.valueOf(str[1]));
+					ChannelManager.addChannel(channnelFuture);
+				}
+			}
+			
+			if(ChannelManager.realServerPaths.size()>0){
+				String[] netMessageArray = ChannelManager.realServerPaths.toArray()[0].toString().split("#");
+				host = netMessageArray[0];
+				port = Integer.valueOf(netMessageArray[1]);
+			}
+	
+		 } catch (Exception e) {
 			e.printStackTrace();
-		 }
+		}
 	 }
 	 
-	 // 注意：1. 每一个请求都是同一个连接，并发问题
 	 // 发送数据
 	 public static Response send(ClientRequest request) {
-		 
+		
+		f = ChannelManager.get(ChannelManager.position);
 		f.channel().writeAndFlush(JSONObject.toJSONString(request)+"\r\n");
+		Long timeout = 60l;
 		ResultFuture future = new ResultFuture(request);
-		return future.get();
+		return future.get(timeout);
 		 
 	 }
+ 
 }

@@ -1,6 +1,8 @@
 package com.zachkoo.consumer.core;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -14,6 +16,8 @@ public class ResultFuture {
 	final Lock lock = new ReentrantLock();
 	private Condition condition = lock.newCondition();
 	private Response response = null;
+	private Long timeout = 2*60*1000l;
+	private Long start = System.currentTimeMillis();
 	
 	public ResultFuture(ClientRequest request) {		
 		allResultFuture.put(request.getId(), this);
@@ -32,6 +36,27 @@ public class ResultFuture {
 			lock.unlock();
 		}
 		return this.response;
+	}
+	
+	public Response get(Long time){
+		lock.lock();
+		try {
+			while(!done()){
+				condition.await(time,TimeUnit.MILLISECONDS);
+				if((System.currentTimeMillis()-start)>time){
+					System.out.println("Future中的请求超时");                                                                                                                                                                                                   
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			lock.unlock();
+			System.out.println(Thread.currentThread().getName() + "get处释放锁!");
+		}
+		
+		return this.response;
+		
 	}
 	
 	public static void receive(Response response) {
@@ -64,5 +89,48 @@ public class ResultFuture {
 			return true;
 		}
 		return false;
+	}
+
+	public Long getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(Long timeout) {
+		this.timeout = timeout;
+	}
+
+	public Long getStart() {
+		return start;
+	}
+
+	public void setStart(Long start) {
+		this.start = start;
+	}
+	
+	//清理线程
+	static class ClearFutureThread extends Thread{
+		@Override
+		public void run() {
+			Set<Long> ids = allResultFuture.keySet();
+			for(Long id : ids){
+				ResultFuture future = allResultFuture.get(id);
+				if(future==null){
+					allResultFuture.remove(id);
+				}else if(future.getTimeout()<(System.currentTimeMillis()-future.getStart()))
+				{//链路超时
+					Response response = new Response();
+					response.setId(id);
+					response.setCode("333333");
+					response.setMsg("链路请求超时");
+					receive(response);
+				}
+			}
+		}
+	}
+	
+	static{
+		ClearFutureThread clearThread = new ClearFutureThread();
+		clearThread.setDaemon(true);
+		clearThread.start();
 	}
 }
