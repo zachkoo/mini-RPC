@@ -1,6 +1,5 @@
 package com.zachkoo.netty.medium;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +20,7 @@ public class Medium {
 	
 	private Medium(){}
 	
+	// Singleton
 	public static Medium newInstance(){
 		if(medium == null){
 			medium = new Medium();

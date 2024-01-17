@@ -9,13 +9,13 @@ import com.zachkoo.user.bean.User;
 @Service
 public class UserService {
 
-	public void save(User user) {
+	public void saveUser(User user) {
 		
 		// 访问mysql
 		
 	}
 
-	public void saveList(List<User> users) {
+	public void saveUserList(List<User> users) {
 		
 	}
 

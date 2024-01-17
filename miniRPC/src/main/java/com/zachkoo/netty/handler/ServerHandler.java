@@ -15,7 +15,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		ServerRequest request = JSONObject.parseObject(msg.toString(), ServerRequest.class);
-		Medium medium = Medium.newInstance();
+		Medium medium = Medium.newInstance(); // Singleton
 		Response result = medium.process(request);
 		ctx.channel().writeAndFlush(JSONObject.toJSONString(result)+"\r\n");
 	}

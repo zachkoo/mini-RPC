@@ -17,12 +17,12 @@ public class UserRemoteImpl implements UserRemote {
 	private UserService userService;
 	
 	public Response saveUser(User user) {
-		userService.save(user);
+		userService.saveUser(user);
 		return ResponseUtil.createSuccessResponse(user);
 	}
 	
-	public Response saveUsers(List<User> users) {
-		userService.saveList(users);
+	public Response saveUserList(List<User> users) {
+		userService.saveUserList(users);
 		return ResponseUtil.createSuccessResponse(users);
 	}
 }

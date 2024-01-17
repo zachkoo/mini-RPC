@@ -1,11 +1,10 @@
-package com.zachkoo.user.remote;
+package com.zachkoo.user;
 
 import java.util.List;
 
 import com.zachkoo.consumer.param.Response;
-import com.zachkoo.user.bean.User;
 
 public interface UserRemote {
 	public Response saveUser(User user);
-	public Response saveUsers(List<User> userlist);
+	public Response saveUserList(List<User> userlist);
 }

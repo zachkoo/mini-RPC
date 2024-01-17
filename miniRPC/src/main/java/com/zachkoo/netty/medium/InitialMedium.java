@@ -14,17 +14,13 @@ import com.zachkoo.netty.annotation.Remote;
 public class InitialMedium implements BeanPostProcessor{
 
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		return bean;
-	}
-
-	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		
 		if(bean.getClass().isAnnotationPresent(Remote.class)) {
 			Method[] methods = bean.getClass().getDeclaredMethods();
 			for(Method m: methods) {
-				String key = bean.getClass().getInterfaces()[0].getName()+"."+m.getName();
+//				String key = bean.getClass().getInterfaces()[0].getName()+"."+m.getName();
+				String key = m.getName();
 				Map<String, BeanMethod> beanMap = Medium.beanMap;
 				BeanMethod beanMethod = new BeanMethod();
 				beanMethod.setBean(bean);
@@ -33,6 +29,11 @@ public class InitialMedium implements BeanPostProcessor{
 			}
 		}
 		
+		return bean;
+	}
+	
+	@Override
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
 	

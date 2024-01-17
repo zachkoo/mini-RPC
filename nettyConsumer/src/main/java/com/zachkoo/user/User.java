@@ -1,4 +1,4 @@
-package com.zachkoo.user.bean;
+package com.zachkoo.user;
 
 public class User {
 	

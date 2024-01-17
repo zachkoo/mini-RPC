@@ -14,8 +14,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.alibaba.fastjson.JSONObject;
 import com.zachkoo.consumer.annotation.RemoteInvoke;
 import com.zachkoo.consumer.param.Response;
-import com.zachkoo.user.bean.User;
-import com.zachkoo.user.remote.UserRemote;
+import com.zachkoo.user.User;
+import com.zachkoo.user.UserRemote;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -24,7 +24,7 @@ import com.zachkoo.user.remote.UserRemote;
 public class RemoteInvokeTest {
 	
 	@RemoteInvoke
-	public UserRemote userRemote;
+	private UserRemote userRemote;
 	
 	@Test
 	public void testSaveUser(){
@@ -36,7 +36,7 @@ public class RemoteInvokeTest {
 	}
 	
 	@Test
-	public void testSaveUsers(){
+	public void testSaveUserList(){
 		List<User> users = new ArrayList<>();
 		User u1 = new User();
 		u1.setId(1);
@@ -50,7 +50,7 @@ public class RemoteInvokeTest {
 		users.add(u1);
 		users.add(u2);
 		users.add(u3);
-		Response response = userRemote.saveUsers(users);
+		Response response = userRemote.saveUserList(users);
 		System.out.println(JSONObject.toJSONString(response));
 	}		
 

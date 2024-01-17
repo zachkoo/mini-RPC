@@ -22,10 +22,6 @@ public class InvokeProxy implements BeanPostProcessor {
 	
 	public static Enhancer enhancer = new Enhancer();
 
-	public Object postProcessAfterInitialization(Object bean, String arg1) throws BeansException {
-		return bean;
-	}
-
 	public Object postProcessBeforeInitialization(Object bean, String arg1) throws BeansException {
 
 		Field[] fields = bean.getClass().getDeclaredFields();
@@ -41,9 +37,8 @@ public class InvokeProxy implements BeanPostProcessor {
 					public Object intercept(Object instance, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 						ClientRequest request = new ClientRequest();
 						request.setContent(args[0]);
-						String command= methodClassMap.get(method).getName()+"."+method.getName();
-//						String command = method.getName();//修改
-//						System.out.println("InvokeProxy中的Command是:"+command);
+//						String command= methodClassMap.get(method).getName()+"."+method.getName();
+						String command = method.getName();
 						request.setCommand(command);
 						
 						Response response = NettyClient.send(request);
@@ -68,6 +63,11 @@ public class InvokeProxy implements BeanPostProcessor {
 			methodClassMap.put(method, field.getType());
 		}
 		
+	}
+	
+
+	public Object postProcessAfterInitialization(Object bean, String arg1) throws BeansException {
+		return bean;
 	}
 
 }
